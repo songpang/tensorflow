@@ -4,8 +4,8 @@ import tensorflow as tf
 import numpy as np
 
 xy = np.loadtxt('Data/data-01-test-score.csv', delimiter=',')
-x_data = xy[:,0:-1] ####### 원래 xy[0:25, 0:-1] --> 행 : 앞 열 : 뒤 #######
-y_data = xy[:,[-1]]
+x_data = xy[:, 0:-1] ####### 원래 xy[0:25, 0:-1] --> 행 : 앞 열 : 뒤 #######
+y_data = xy[:, [-1]]
 
 print(x_data.shape, x_data, len(x_data))
 print(y_data.shape, y_data, len(y_data))
@@ -27,7 +27,7 @@ train = optimizer.minimize(cost)
 sess = tf.Session()
 sess.run(tf.global_variables_initializer())
 
-for step in range(2001):
+for step in range(10001):
     sess.run(train, feed_dict={X:x_data, Y:y_data})
     if step % 20 == 0:
         print(step, sess.run(cost, feed_dict={X:x_data, Y:y_data}))
