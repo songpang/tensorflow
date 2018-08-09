@@ -9,7 +9,6 @@ xy = np.loadtxt('Data/data-03-diabetes.csv', delimiter=',', dtype=np.float32)
 x_data = xy[0:531, 0:-1]
 y_data = xy[0:531, [-1]]
 
-
 X = tf.placeholder(tf.float32, shape=[None, 8])
 Y = tf.placeholder(tf.float32, shape=[None, 1])
 
