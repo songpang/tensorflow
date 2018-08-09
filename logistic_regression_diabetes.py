@@ -19,7 +19,7 @@ b = tf.Variable(tf.random_normal([1]), name='bias')
 hypothesis = tf.sigmoid(tf.matmul(X, W) + b)
 
 cost = -tf.reduce_mean(Y * tf.log(hypothesis) +
-                       (1-Y) * tf.log(hypothesis))
+                       (1-Y) * tf.log(1 - hypothesis))
 
 optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.01)
 train = optimizer.minimize(cost)
@@ -33,15 +33,20 @@ accuracy = tf.reduce_mean(tf.cast(tf.equal(predict, Y),
                                   dtype=tf.float32))
 
 
-for step in range(100001):
-    _, cost_val = sess.run([train, cost], feed_dict={X:x_data, Y:y_data})
+for step in range(10001):
+    _, cost_val, W_val, b_val = sess.run([train, cost, W, b],
+                                         feed_dict={X:x_data, Y:y_data})
     if step % 20 == 0:
-        print(step , cost_val)
+        print(step, cost_val, W_val, b_val)
 
+
+h, p, a = sess.run([hypothesis, predict, accuracy],
+                   feed_dict={X:x_data, Y:y_data})
+
+print("\nHypothesis:\n", h, "\nPredict:\n", p, "\nAccuracy:\n", a)
 
 # Test 30% data
 x_data = xy[531:, 0:-1]
 y_data = xy[531:, [-1]]
 
-ppp , aaa = sess.run([predict, accuracy], feed_dict={X:x_data, Y:y_data})
-print(ppp,aaa)
+print(sess.run(predict, feed_dict={X:x_data}))
