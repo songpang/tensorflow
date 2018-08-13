@@ -1,5 +1,5 @@
-# mnist_softmax.py
-# simple layer
+# mnist_nn_deep.py
+# xavier initializer
 
 import tensorflow as tf
 old_v = tf.logging.get_verbosity()          # warning
@@ -13,17 +13,42 @@ mnist = input_data.read_data_sets('Data/mnist', one_hot=True)
 print(type(mnist))
 print(type(mnist.train))
 
-learning_rate = 0.01
+learning_rate = 0.001
 training_epcohs = 15
 batch_size = 100
 
 X = tf.placeholder(tf.float32, shape=[None, 784])
 Y = tf.placeholder(tf.float32, shape=[None, 10])
 
-W = tf.Variable(tf.random_normal([784, 10]), name='weight')
-b = tf.Variable(tf.random_normal([10]), name='bias')
+# W1 = tf.Variable(tf.random_normal([784, 256]), name='weight1')
+W1 = tf.get_variable("W1", shape=[784,512],
+                     initializer=tf.contrib.layers.xavier_initializer())
+b1 = tf.Variable(tf.random_normal([512]), name='bias1')
+layer1 = tf.nn.relu(tf.matmul(X, W1) + b1)
 
-logits = tf.matmul(X, W) + b # (?, 784) * (784, 10) = (?, 10)
+# W2 = tf.Variable(tf.random_normal([256, 256]), name='weight2')
+W2 = tf.get_variable("W2", shape=[512, 512],
+                     initializer=tf.contrib.layers.xavier_initializer())
+b2 = tf.Variable(tf.random_normal([512]), name='bias2')
+layer2 = tf.nn.relu(tf.matmul(layer1, W2) + b2)
+
+# W3 = tf.Variable(tf.random_normal([784, 256]), name='weight1')
+W3 = tf.get_variable("W3", shape=[512, 512],
+                     initializer=tf.contrib.layers.xavier_initializer())
+b3 = tf.Variable(tf.random_normal([512]), name='bias1')
+layer3 = tf.nn.relu(tf.matmul(layer2, W3) + b3)
+
+# W4 = tf.Variable(tf.random_normal([256, 256]), name='weight2')
+W4 = tf.get_variable("W4", shape=[512, 512],
+                     initializer=tf.contrib.layers.xavier_initializer())
+b4 = tf.Variable(tf.random_normal([512]), name='bias2')
+layer4 = tf.nn.relu(tf.matmul(layer3, W4) + b4)
+# W5 = tf.Variable(tf.random_normal([784, 256]), name='weight1')
+W5 = tf.get_variable("W5", shape=[512, 10],
+                     initializer=tf.contrib.layers.xavier_initializer())
+b5 = tf.Variable(tf.random_normal([10]), name='bias1')
+
+logits = tf.matmul(layer4, W5) + b5 # (?, 784) * (784, 10) = (?, 10)
 hypothesis = tf.nn.softmax(logits)
 
 cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=logits, labels=Y))
@@ -72,14 +97,3 @@ plt.imshow(mnist.test.images[r:r+1].reshape(28, 28),
            cmap="Greys", interpolation='nearest') # 2차원 보간법
 
 plt.show()
-
-# Epoch:  0011 cost:  0.293943021
-# Epoch:  0012 cost:  0.286706591
-# Epoch:  0013 cost:  0.284374953
-# Epoch:  0014 cost:  0.281401397
-# Epoch:  0015 cost:  0.276826122
-# Learning Finished!!
-#
-# Accuracy 0.9163
-# random =  2242 Label:  [2]
-# Prediction : [2]

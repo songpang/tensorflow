@@ -1,6 +1,3 @@
-# mnist_softmax.py
-# simple layer
-
 import tensorflow as tf
 old_v = tf.logging.get_verbosity()          # warning
 tf.logging.set_verbosity(tf.logging.ERROR)  # warning (Please use alternatives such as official/mnist/dataset.py from tensorflow/models.)
@@ -20,10 +17,17 @@ batch_size = 100
 X = tf.placeholder(tf.float32, shape=[None, 784])
 Y = tf.placeholder(tf.float32, shape=[None, 10])
 
-W = tf.Variable(tf.random_normal([784, 10]), name='weight')
-b = tf.Variable(tf.random_normal([10]), name='bias')
+W1 = tf.Variable(tf.random_normal([784, 256]), name='weight1')
+b1 = tf.Variable(tf.random_normal([256]), name='bias1')
+layer1 = tf.nn.relu(tf.matmul(X, W1) + b1)
 
-logits = tf.matmul(X, W) + b # (?, 784) * (784, 10) = (?, 10)
+W2 = tf.Variable(tf.random_normal([256, 256]), name='weight2')
+b2 = tf.Variable(tf.random_normal([256]), name='bias2')
+layer2 = tf.nn.relu(tf.matmul(layer1, W2) + b2)
+
+W3 = tf.Variable(tf.random_normal([256, 10]), name='weight3')
+b3 = tf.Variable(tf.random_normal([10]), name='bias3')
+logits = tf.matmul(layer2, W3) + b3 # (?, 784) * (784, 10) = (?, 10)
 hypothesis = tf.nn.softmax(logits)
 
 cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=logits, labels=Y))
@@ -70,16 +74,28 @@ print("Prediction :", sess.run(tf.arg_max(hypothesis, 1), feed_dict={X: mnist.te
 
 plt.imshow(mnist.test.images[r:r+1].reshape(28, 28),
            cmap="Greys", interpolation='nearest') # 2차원 보간법
-
 plt.show()
 
-# Epoch:  0011 cost:  0.293943021
-# Epoch:  0012 cost:  0.286706591
-# Epoch:  0013 cost:  0.284374953
-# Epoch:  0014 cost:  0.281401397
-# Epoch:  0015 cost:  0.276826122
+# 1. Using sigmoid()
+# Epoch: 0013 cost: 0.089156166
+# Epoch: 0014 cost: 0.088041230
+# Epoch: 0015 cost: 0.081572730
 # Learning Finished!!
+# train images total number =  55000
+# test image total number =  10000
 #
-# Accuracy 0.9163
-# random =  2242 Label:  [2]
-# Prediction : [2]
+# Accuracy: [0.9677]
+# random= 2077 Label: [5]
+# Prediction : [5]
+
+# 2. Using relu()
+# Epoch: 0013 cost: 0.998624213
+# Epoch: 0014 cost: 0.833025968
+# Epoch: 0015 cost: 0.717969654
+# Learning Finished!!
+# train images total number =  55000
+# test image total number =  10000
+#
+# Accuracy: [0.9656]
+# random= 2581 Label: [5]
+# Prediction : [5]

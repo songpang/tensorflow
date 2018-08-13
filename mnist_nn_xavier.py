@@ -1,5 +1,5 @@
-# mnist_softmax.py
-# simple layer
+# mnist_nn_xavier.py
+# xavier initializer
 
 import tensorflow as tf
 old_v = tf.logging.get_verbosity()          # warning
@@ -20,10 +20,23 @@ batch_size = 100
 X = tf.placeholder(tf.float32, shape=[None, 784])
 Y = tf.placeholder(tf.float32, shape=[None, 10])
 
-W = tf.Variable(tf.random_normal([784, 10]), name='weight')
-b = tf.Variable(tf.random_normal([10]), name='bias')
+# W1 = tf.Variable(tf.random_normal([784, 256]), name='weight1')
+W1 = tf.get_variable("W1", shape=[784,256],
+                     initializer=tf.contrib.layers.xavier_initializer())
+b1 = tf.Variable(tf.random_normal([256]), name='bias1')
+layer1 = tf.nn.relu(tf.matmul(X, W1) + b1)
 
-logits = tf.matmul(X, W) + b # (?, 784) * (784, 10) = (?, 10)
+# W2 = tf.Variable(tf.random_normal([256, 256]), name='weight2')
+W2 = tf.get_variable("W2", shape=[256,256],
+                     initializer=tf.contrib.layers.xavier_initializer())
+b2 = tf.Variable(tf.random_normal([256]), name='bias2')
+layer2 = tf.nn.relu(tf.matmul(layer1, W2) + b2)
+
+# W3 = tf.Variable(tf.random_normal([256, 10]), name='weight3')
+W3 = tf.get_variable("W3", shape=[256,10],
+                     initializer=tf.contrib.layers.xavier_initializer())
+b3 = tf.Variable(tf.random_normal([10]), name='bias3')
+logits = tf.matmul(layer2, W3) + b3 # (?, 784) * (784, 10) = (?, 10)
 hypothesis = tf.nn.softmax(logits)
 
 cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=logits, labels=Y))
@@ -72,14 +85,3 @@ plt.imshow(mnist.test.images[r:r+1].reshape(28, 28),
            cmap="Greys", interpolation='nearest') # 2차원 보간법
 
 plt.show()
-
-# Epoch:  0011 cost:  0.293943021
-# Epoch:  0012 cost:  0.286706591
-# Epoch:  0013 cost:  0.284374953
-# Epoch:  0014 cost:  0.281401397
-# Epoch:  0015 cost:  0.276826122
-# Learning Finished!!
-#
-# Accuracy 0.9163
-# random =  2242 Label:  [2]
-# Prediction : [2]
